@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot de Detonação</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        #chatbox { width: 400px; height: 400px; border: 1px solid #ccc; padding: 10px; overflow-y: scroll; }
+        #userInput { width: 300px; }
+    </style>
+</head>
+<body>
+    <h2>Chatbot de Detonação</h2>
+    <div id="chatbox"></div>
+    <input type="text" id="userInput" placeholder="Digite sua pergunta...">
+    <button onclick="sendMessage()">Enviar</button>
+
+    <script>
+        const rules = {
+            "Responsável Técnico": {
+                "Quem pode ser o responsável técnico pela detonação?": "São aceitos como responsável técnico: engenheiro de minas, engenheiro civil, geólogo, técnico em mineração, que devem possuir registro no CREA /CRT.",
+                "O responsável técnico pela detonação deve ter vínculo com a contratante ou contratada?": "O responsável técnico designado na autorização de detonação deve ter vínculo com a empresa responsável pela detonação.",
+                "Quem deve assinar a ART ou CRT?": "O responsável pela ART/CRT deve ser o mesmo responsável pelo serviço de detonação descrito no requerimento da autorização do serviço de detonação.",
+                "A ART pode ser assinada por profissional de outras regiões do país (CREA MG, RJ etc.)?": "Sim, desde que ele tenha vínculo com a empresa executante do serviço de detonação."
+            },
+            "Autorização de Detonação": {
+                "Quem presta o serviço de detonação para terceiros (contratado) precisa possuir registro no Exército? E com qual atividade no registro?": "O prestador do serviço de detonação (contratado) deve possuir registro no Exército, especificamente com a atividade de 'prestação de serviço de detonação'.",
+                "Quem contrata o serviço de detonação precisa possuir registro no Exército? E com qual atividade no registro?": "Quem contrata o serviço (contratante) precisa ter registro no Exército com a atividade 'utilização - aplicação de explosivos' (somente de forma terceirizada)."
+            },
+            "Autorização para Aquisição de Explosivos": {
+                "Quando deve ser requerida a 'autorização para aquisição de explosivos'?": "A 'autorização para aquisição de explosivos' deve ser solicitada através do SICOEx, e se faz necessária sempre que houver a aquisição dos explosivos classificados nos grupos de ordem 3.1, 3.3 e 3.4.",
+                "O que é necessário para requerer a 'autorização para aquisição de explosivos'?": "Para a aquisição de explosivos, é necessário registro no Exército com atividade que pressuponha a aquisição e com a atividade de armazenamento apostilada."
+            }
+        };
+
+        function findClosestMatch(userText) {
+            let bestMatch = null;
+            let highestSimilarity = 0;
+            
+            for (const category in rules) {
+                for (const question in rules[category]) {
+                    let similarity = getSimilarity(userText.toLowerCase(), question.toLowerCase());
+                    if (similarity > highestSimilarity) {
+                        highestSimilarity = similarity;
+                        bestMatch = rules[category][question];
+                    }
+                }
+            }
+            
+            return highestSimilarity > 0.5 ? bestMatch : null;
+        }
+
+        function getSimilarity(str1, str2) {
+            let words1 = str1.split(" ");
+            let words2 = str2.split(" ");
+            let matches = words1.filter(word => words2.includes(word)).length;
+            return matches / Math.max(words1.length, words2.length);
+        }
+
+        function sendMessage() {
+            const inputField = document.getElementById("userInput");
+            const chatbox = document.getElementById("chatbox");
+            let userText = inputField.value;
+            
+            if (!userText.trim()) return;
+            
+            let botResponse = findClosestMatch(userText) || "Desculpe, não tenho uma resposta para essa pergunta.";
+            
+            chatbox.innerHTML += `<p><strong>Você:</strong> ${userText}</p>`;
+            chatbox.innerHTML += `<p><strong>Bot:</strong> ${botResponse}</p>`;
+            chatbox.scrollTop = chatbox.scrollHeight;
+            inputField.value = "";
+        }
+    </script>
+</body>
+</html>

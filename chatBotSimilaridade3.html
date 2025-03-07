@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot de Detonação</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        #chatbox { width: 400px; height: 400px; border: 1px solid #ccc; padding: 10px; overflow-y: scroll; }
+        #userInput { width: 300px; }
+    </style>
+</head>
+<body>
+    <h2>Chatbot de Detonação</h2>
+    <div id="chatbox"></div>
+    <input type="text" id="userInput" placeholder="Digite sua pergunta...">
+    <button onclick="sendMessage()">Enviar</button>
+
+    <script>
+        const rules = {
+            "Responsável Técnico": {
+                "Quem pode ser o responsável técnico pela detonação?": "São aceitos como responsável técnico: engenheiro de minas, engenheiro civil, geólogo, técnico em mineração, que devem possuir registro no CREA /CRT.",
+                "O responsável técnico pela detonação deve ter vínculo com a contratante ou contratada?": "O responsável técnico designado na autorização de detonação deve ter vínculo com a empresa responsável pela detonação.",
+                "Quem deve assinar a ART ou CRT?": "O responsável pela ART/CRT deve ser o mesmo responsável pelo serviço de detonação descrito no requerimento da autorização do serviço de detonação.",
+                "A ART pode ser assinada por profissional de outras regiões do país (CREA MG, RJ etc.)?": "Sim, desde que ele tenha vínculo com a empresa executante do serviço de detonação."
+            },
+            "Autorização de Detonação": {
+                "Quem presta o serviço de detonação para terceiros (contratado) precisa possuir registro no Exército? E com qual atividade no registro?": "O prestador do serviço de detonação (contratado) deve possuir registro no Exército, especificamente com a atividade de 'prestação de serviço de detonação'.",
+                "Quem contrata o serviço de detonação precisa possuir registro no Exército? E com qual atividade no registro?": "Quem contrata o serviço (contratante) precisa ter registro no Exército com a atividade 'utilização - aplicação de explosivos' (somente de forma terceirizada)."
+            },
+            "Autorização para Aquisição de Explosivos": {
+                "Quando deve ser requerida a 'autorização para aquisição de explosivos'?": "A 'autorização para aquisição de explosivos' deve ser solicitada através do SICOEx, e se faz necessária sempre que houver a aquisição dos explosivos classificados nos grupos de ordem 3.1, 3.3 e 3.4.",
+                "O que é necessário para requerer a 'autorização para aquisição de explosivos'?": "Para a aquisição de explosivos, é necessário registro no Exército com atividade que pressuponha a aquisição e com a atividade de armazenamento apostilada."
+            }
+        };
+
+        // Função para quebrar o texto em palavras-chave
+        function extractKeywords(text) {
+            return text.toLowerCase().split(" ").filter(word => word.length > 2); // Remove palavras pequenas
+        }
+
+        // Função para verificar correspondência de palavras-chave
+        function findBestMatch(userText) {
+            const userKeywords = extractKeywords(userText);
+            let bestMatch = { question: "", answer: "", score: 0 };
+
+            // Percorrer as perguntas e verificar as palavras-chave
+            for (const category in rules) {
+                for (const question in rules[category]) {
+                    const questionKeywords = extractKeywords(question);
+                    let score = 0;
+
+                    // Comparar palavras do usuário com palavras da pergunta
+                    userKeywords.forEach(userWord => {
+                        questionKeywords.forEach(questionWord => {
+                            if (questionWord.includes(userWord)) {
+                                score++;
+                            }
+                        });
+                    });
+
+                    // Se houver correspondência, atualizar a melhor resposta
+                    if (score > bestMatch.score) {
+                        bestMatch = { question: question, answer: rules[category][question], score: score };
+                    }
+                }
+            }
+
+            return bestMatch;
+        }
+
+        // Função que envia a mensagem e exibe a resposta
+        function sendMessage() {
+            const inputField = document.getElementById("userInput");
+            const chatbox = document.getElementById("chatbox");
+            let userText = inputField.value;
+
+            if (!userText.trim()) return;
+
+            let bestMatch = findBestMatch(userText);
+            let botResponse = bestMatch.score > 0 ? bestMatch.answer : "Desculpe, não tenho uma resposta para essa pergunta.";
+
+            // Adicionar indicação da pergunta chave mais próxima
+            let followUpText = bestMatch.score > 0 ? `Caso esteja se referindo à pergunta: <em>"${bestMatch.question}"</em>.` : "";
+
+            // Inverter a ordem: pergunta chave mais próxima primeiro, depois a resposta
+            chatbox.innerHTML += `<p><strong>Você:</strong> ${userText}</p>`;
+            chatbox.innerHTML += `<p><strong>Bot:</strong> ${followUpText} ${botResponse}</p>`;
+            chatbox.scrollTop = chatbox.scrollHeight;
+            inputField.value = "";
+        }
+    </script>
+</body>
+</html>
