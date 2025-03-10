@@ -11,50 +11,79 @@
         /* Definindo cores e fontes do Material Design */
         body {
             font-family: 'Roboto', sans-serif;
+            /* Fonte do Google Fonts - Roboto */
             background-color: #f5f5f5;
+            /* Cor de fundo clara */
             margin: 0;
+            /* Remove a margem padrão */
             padding: 0;
+            /* Remove o padding padrão */
             display: flex;
+            /* Utiliza Flexbox para o layout */
             justify-content: center;
+            /* Centraliza horizontalmente */
             align-items: center;
+            /* Centraliza verticalmente */
             height: 100vh;
+            /* Define a altura como 100% da viewport */
             color: #333;
+            /* Cor do texto */
             flex-direction: column;
+            /* Organiza os elementos na vertical */
             /* Permite o layout flexível vertical */
         }
 
         h2 {
             font-size: 24px;
+            /* Tamanho da fonte do título */
             color: #00796b;
+            /* Cor do título */
             margin-bottom: 20px;
+            /* Espaçamento inferior */
         }
 
         /* Container do chat */
         #chatbox {
             width: 800px;
+            /* Largura do container do chat */
             height: 400px;
+            /* Altura do container do chat */
             border-radius: 8px;
+            /* Bordas arredondadas */
             border: 1px solid #ccc;
+            /* Borda do container */
             background-color: #fff;
+            /* Cor de fundo do chat */
             padding: 20px;
+            /* Padding interno do container */
             overflow-y: auto;
+            /* Barra de rolagem vertical se necessário */
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            /* Sombra suave ao redor do chat */
             animation: fadeIn 0.3s ease;
+            /* Animação de aparecimento suave */
         }
 
         /* Estilo do botão */
         button {
             background-image: linear-gradient(to right, #00796b, #00796b);
-            /* Gradiente linear */
+            /* Gradiente linear do botão */
             color: white;
+            /* Cor do texto no botão */
             font-size: 16px;
+            /* Tamanho da fonte do botão */
             border: none;
+            /* Remove a borda padrão */
             padding: 10px 20px;
+            /* Padding do botão */
             cursor: pointer;
+            /* Cursor de pointer para indicar que é clicável */
             border-radius: 4px;
+            /* Bordas arredondadas do botão */
             transition: background-image 0.3s;
-            /* Transição suave para o gradiente */
+            /* Transição suave do gradiente */
             margin-top: 10px;
+            /* Espaçamento superior do botão */
         }
 
         /* Efeito de mudança de cor do gradiente ao passar o mouse */
@@ -63,91 +92,124 @@
             /* Inverte as cores no hover */
         }
 
-
         /* Input de texto */
         #userInput {
             width: 100%;
+            /* Largura do input (100% do container) */
             padding: 10px;
+            /* Padding do input */
             font-size: 16px;
+            /* Tamanho da fonte */
             border: 1px solid #ccc;
+            /* Borda do input */
             border-radius: 4px;
+            /* Bordas arredondadas */
             margin-top: 10px;
+            /* Espaçamento superior */
             box-sizing: border-box;
+            /* Inclui o padding na largura total do elemento */
             transition: border-color 0.3s;
+            /* Transição suave para a borda */
         }
 
+        /* Efeito de foco no input */
         #userInput:focus {
             border-color: #00796b;
+            /* Cor da borda ao focar */
             outline: none;
+            /* Remove o outline padrão */
         }
 
         /* Adicionando animação fade-in */
         .fade-in {
             animation: fadeIn 0.5s ease;
+            /* Animação de fade-in */
         }
 
         /* Animação de fade-in */
         @keyframes fadeIn {
             from {
                 opacity: 0;
+                /* Inicia invisível */
             }
 
             to {
                 opacity: 1;
+                /* Termina visível */
             }
         }
-
 
         /* Estilo das mensagens */
         .user-message,
         .bot-message {
             margin-bottom: 15px;
+            /* Espaçamento inferior das mensagens */
             padding: 10px;
+            /* Padding das mensagens */
             border-radius: 8px;
+            /* Bordas arredondadas nas mensagens */
             max-width: 95%;
+            /* Largura máxima das mensagens */
             word-wrap: break-word;
+            /* Quebra de linha nas palavras */
         }
 
         .user-message {
             background-color: #00796b;
+            /* Cor de fundo das mensagens do usuário */
             color: white;
+            /* Cor do texto das mensagens do usuário */
             align-self: flex-end;
+            /* Alinha a mensagem do usuário à direita */
             animation: slideInRight 0.5s ease;
+            /* Animação de entrada da mensagem do usuário */
         }
 
         .bot-message {
             background-color: #eeeeee;
+            /* Cor de fundo das mensagens do bot */
             color: #333;
+            /* Cor do texto das mensagens do bot */
             animation: slideInLeft 0.5s ease;
+            /* Animação de entrada da mensagem do bot */
         }
 
         /* Animação de entrada das mensagens */
         @keyframes slideInRight {
             from {
                 transform: translateX(100%);
+                /* Inicia fora da tela, à direita */
             }
 
             to {
                 transform: translateX(0);
+                /* Finaliza na posição original */
             }
         }
 
         @keyframes slideInLeft {
             from {
                 transform: translateX(-100%);
+                /* Inicia fora da tela, à esquerda */
             }
 
             to {
                 transform: translateX(0);
+                /* Finaliza na posição original */
             }
         }
 
+        /* Estilo de texto para acompanhamento */
         .follow-up {
             font-style: italic;
+            /* Texto em itálico */
             color: #00796b;
+            /* Cor do texto */
             margin-top: 10px;
+            /* Espaçamento superior */
         }
     </style>
+
 </head>
 
 <body>
@@ -382,7 +444,7 @@
                     default: return char;
                 }
             });
-        }        
+        }
 
         function sanitizeInput(input) {
             // Cria um elemento div temporário para remover qualquer tag HTML
