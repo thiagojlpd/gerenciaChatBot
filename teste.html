@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot de Detonação</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Definindo cores e fontes do Material Design */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+            flex-direction: column;
+            /* Permite o layout flexível vertical */
+        }
+
+        h2 {
+            font-size: 24px;
+            color: #00796b;
+            margin-bottom: 20px;
+        }
+
+        /* Container do chat */
+        #chatbox {
+            width: 800px;
+            height: 400px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* Estilo do botão */
+        button {
+            background-color: #00796b;
+            color: white;
+            font-size: 16px;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #004d40;
+        }
+
+        /* Input de texto */
+        #userInput {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-top: 10px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        #userInput:focus {
+            border-color: #00796b;
+            outline: none;
+        }
+
+        /* Adicionando animação fade-in */
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* Animação de fade-in */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Estilo das mensagens */
+        .user-message,
+        .bot-message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            max-width: 95%;
+            word-wrap: break-word;
+        }
+
+        .user-message {
+            background-color: #00796b;
+            color: white;
+            align-self: flex-end;
+            animation: slideInRight 0.5s ease;
+        }
+
+        .bot-message {
+            background-color: #eeeeee;
+            color: #333;
+            animation: slideInLeft 0.5s ease;
+        }
+
+        /* Animação de entrada das mensagens */
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+            }
+
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                transform: translateX(-100%);
+            }
+
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        .follow-up {
+            font-style: italic;
+            color: #00796b;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div>
+        <h2>Chatbot de Detonação</h2>
+        <div id="chatbox"></div>
+        <input type="text" id="userInput" placeholder="Digite sua pergunta...">
+        <button onclick="sendMessage()">Enviar</button>
+    </div>
+
+    <script>
+        const rules = {
+            "Responsável Técnico": {
+                "Quem pode ser o responsável técnico pela detonação?": "São aceitos como responsável técnico: engenheiro de minas, engenheiro civil, geólogo, técnico em mineração, que devem possuir registro no CREA /CRT.",
+                "O responsável técnico pela detonação deve ter vínculo com a contratante ou contratada?": "O responsável técnico designado na autorização de detonação deve ter vínculo com a empresa responsável pela detonação.",
+                "Quem deve assinar a ART ou CRT?": "O responsável pela ART/CRT deve ser o mesmo responsável pelo serviço de detonação descrito no requerimento da autorização do serviço de detonação.",
+                "A ART pode ser assinada por profissional de outras regiões do país (CREA MG, RJ etc.)?": "Sim, desde que ele tenha vínculo com a empresa executante do serviço de detonação."
+            },
+            "Autorização de Detonação": {
+                "Quem presta o serviço de detonação para terceiros (contratado) precisa possuir registro? E com qual atividade no registro?": "O prestador do serviço de detonação (contratado) deve possuir registro, especificamente com a atividade de 'prestação de serviço de detonação'.",
+                "Quem contrata o serviço de detonação precisa possuir registro? E com qual atividade no registro?": "Quem contrata o serviço (contratante) precisa ter registro com a atividade 'utilização - aplicação de explosivos' (somente de forma terceirizada)."
+            },
+            "Autorização para Aquisição de Explosivos": {
+                "Quando deve ser requerida a 'autorização para aquisição de explosivos'?": "A 'autorização para aquisição de explosivos' deve ser solicitada, e se faz necessária sempre que houver a aquisição dos explosivos classificados nos grupos de ordem 3.1, 3.3 e 3.4.",
+                "O que é necessário para requerer a 'autorização para aquisição de explosivos'?": "Para a aquisição de explosivos, é necessário registro com atividade que pressuponha a aquisição e com a atividade de armazenamento apostilada."
+            }
+        };
+
+        let showingTopics = false;
+
+        function listTopics() {
+            let message = "<strong>Lista de tópicos disponíveis:</strong><br>";
+            let index = 1;
+            for (const category in rules) {
+                message += `${index}. ${category}<br>`;
+                index++;
+            }
+            message += `<div class="follow-up">Digite o número do tópico desejado para ver as perguntas e respostas correspondentes.</div>`;
+            showingTopics = true;
+            return message;
+        }
+
+        function showQuestionsByTopic(index) {
+            const categories = Object.keys(rules);
+            const topicIndex = parseInt(index, 10) - 1;
+
+            if (isNaN(topicIndex) || topicIndex < 0 || topicIndex >= categories.length) {
+                return "Número inválido. Por favor, escolha um dos números listados.";
+            }
+
+            const selectedCategory = categories[topicIndex];
+            const questions = rules[selectedCategory];
+            let message = `<strong>${selectedCategory}:</strong><br>`;
+            for (const question in questions) {
+                message += `<br><strong>Q:</strong> ${question}<br><strong>R:</strong> ${questions[question]}<br>`;
+            }
+            showingTopics = false;
+            return message;
+        }
+
+        function sendMessage() {
+            const inputField = document.getElementById("userInput");
+            const chatbox = document.getElementById("chatbox");
+            let userText = inputField.value.trim();
+
+            if (!userText) return;
+
+            // Exibe a mensagem do usuário
+            const userMessageDiv = document.createElement("div");
+            userMessageDiv.classList.add("user-message", "fade-in"); // Adiciona a classe de animação
+            userMessageDiv.innerHTML = `<strong>Você:</strong> ${userText}`;
+            chatbox.appendChild(userMessageDiv);
+
+            let botResponse = "";
+            let followUpText = "";
+
+            if (showingTopics && /^\d+$/.test(userText)) {
+                // Usuário escolheu um número de tópico
+                botResponse = showQuestionsByTopic(userText);
+            } else {
+                const bestMatch = findBestMatch(userText);
+                if (bestMatch.score > 0) {
+                    botResponse = bestMatch.answer;
+                    followUpText = `Caso esteja se referindo à pergunta: <em>"${bestMatch.question}"</em>.`;
+                } else {
+                    botResponse = "Desculpe, não tenho uma resposta para essa pergunta. Por favor, pergunte-me sobre assuntos relacionados ou envie-nos uma mensagem através de nosso e-mail.";
+                }
+            }
+
+            // Adiciona a mensagem do bot com animação
+            const botMessageDiv = document.createElement("div");
+            botMessageDiv.classList.add("bot-message", "fade-in");
+            botMessageDiv.innerHTML = `<strong>Bot:</strong> ${followUpText} ${botResponse}`;
+            chatbox.appendChild(botMessageDiv);
+
+            // Rola para a última mensagem
+            chatbox.scrollTop = chatbox.scrollHeight;
+
+            inputField.value = ""; // Limpa o campo de input
+        }
+
+        function findBestMatch(userText) {
+            let bestMatch = { score: 0, question: "", answer: "" };
+
+            // Percorre todas as perguntas e respostas para encontrar a melhor correspondência
+            for (const category in rules) {
+                for (const question in rules[category]) {
+                    const answer = rules[category][question];
+                    const score = getMatchScore(userText, question);
+                    if (score > bestMatch.score) {
+                        bestMatch = { score, question, answer };
+                    }
+                }
+            }
+
+            return bestMatch;
+        }
+
+        function getMatchScore(userText, question) {
+            // Score simples de correspondência por palavras-chave (você pode melhorar isso)
+            const normalizedUserText = userText.toLowerCase();
+            const normalizedQuestion = question.toLowerCase();
+            let score = 0;
+            const words = normalizedUserText.split(" ");
+            for (const word of words) {
+                if (normalizedQuestion.includes(word)) {
+                    score++;
+                }
+            }
+            return score;
+        }
+
+        // Exibe os tópicos quando a página é carregada
+        document.addEventListener("DOMContentLoaded", () => {
+            const chatbox = document.getElementById("chatbox");
+            const botMessageDiv = document.createElement("div");
+            botMessageDiv.classList.add("bot-message");
+            botMessageDiv.innerHTML = listTopics();
+            chatbox.appendChild(botMessageDiv);
+        });
+    </script>
+</body>
+
+</html>

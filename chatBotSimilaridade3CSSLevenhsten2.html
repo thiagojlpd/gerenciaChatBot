@@ -44,20 +44,25 @@
 
         /* Estilo do botão */
         button {
-            background-color: #00796b;
+            background-image: linear-gradient(to right, #00796b, #00796b);
+            /* Gradiente linear */
             color: white;
             font-size: 16px;
             border: none;
             padding: 10px 20px;
             cursor: pointer;
             border-radius: 4px;
-            transition: background-color 0.3s;
+            transition: background-image 0.3s;
+            /* Transição suave para o gradiente */
             margin-top: 10px;
         }
 
+        /* Efeito de mudança de cor do gradiente ao passar o mouse */
         button:hover {
-            background-color: #004d40;
+            background-image: linear-gradient(to right, #00796b, #00796b);
+            /* Inverte as cores no hover */
         }
+
 
         /* Input de texto */
         #userInput {
@@ -148,7 +153,7 @@
 <body>
 
     <div>
-        <h2>Chatbot de Detonação</h2>
+        <h2>Chatbot sobre necessidades de detonação</h2>
         <div id="chatbox"></div>
         <input type="text" id="userInput" placeholder="Digite sua pergunta...">
         <button onclick="sendMessage()">Enviar</button>
@@ -169,8 +174,59 @@
             "Autorização para Aquisição de Explosivos": {
                 "Quando deve ser requerida a 'autorização para aquisição de explosivos'?": "A 'autorização para aquisição de explosivos' deve ser solicitada, e se faz necessária sempre que houver a aquisição dos explosivos classificados nos grupos de ordem 3.1, 3.3 e 3.4.",
                 "O que é necessário para requerer a 'autorização para aquisição de explosivos'?": "Para a aquisição de explosivos, é necessário registro com atividade que pressuponha a aquisição e com a atividade de armazenamento apostilada."
+            },
+            "Teoria dos Quartênios": {
+                "O que é a teoria dos quartênios?": "A teoria dos quartênios é um conceito matemático que envolve a utilização de números chamados 'quartênios'. Esses números formam uma extensão dos números reais e complexos e são usados para representar rotações no espaço tridimensional.",
+                "Quem foi o responsável pela criação dos quartênios?": "Os quartênios foram introduzidos por William Rowan Hamilton, um matemático irlandês, em 1843. Ele buscava uma forma de representar rotações tridimensionais e acabou desenvolvendo os quartênios.",
+                "Como os quartênios se relacionam com os números complexos?": "Os quartênios podem ser vistos como uma extensão dos números complexos. Enquanto os números complexos consistem de uma parte real e uma parte imaginária, os quartênios têm uma parte real e três componentes imaginários.",
+                "Qual é a forma geral de um quartênio?": "Um quartênio é geralmente representado como q = a + bi + cj + dk, onde a, b, c, e d são números reais e i, j, k são as unidades imaginárias, com propriedades específicas de multiplicação.",
+                "Quais são as propriedades das unidades imaginárias i, j, e k?": "As unidades imaginárias i, j, e k têm as seguintes propriedades: i² = j² = k² = ijk = -1, ij = k, jk = i, ki = j. As multiplicações entre elas não comutam, ou seja, a multiplicação de quartênios é não comutativa.",
+                "Como os quartênios são utilizados para representar rotações tridimensionais?": "Os quartênios são usados para representar rotações no espaço tridimensional de maneira eficiente, sem as limitações das matrizes de rotação, como a singularidade ou a complexidade computacional.",
+                "O que é a multiplicação de quartênios?": "A multiplicação de quartênios é uma operação binária que segue regras específicas, como a não comutatividade. A multiplicação de quartênios pode ser vista como a composição de rotações no espaço tridimensional.",
+                "Qual é a diferença entre números complexos e quartênios em termos de dimensionalidade?": "Os números complexos são bidimensionais, compostos de uma parte real e uma imaginária, enquanto os quartênios são uma estrutura de 4 dimensões (1 real e 3 imaginárias).",
+                "Os quartênios têm alguma aplicação prática?": "Sim, os quartênios são amplamente usados em gráficos computacionais, computação 3D, física quântica, robótica e na modelagem de rotações em sistemas tridimensionais.",
+                "Como a teoria dos quartênios é útil em computação gráfica?": "Na computação gráfica, os quartênios são usados para representar e realizar rotações em objetos 3D de forma mais eficiente que as matrizes de rotação tradicionais, evitando problemas como gimbal lock.",
+                "O que é o 'gimbal lock' e como os quartênios ajudam a evitar isso?": "O gimbal lock é uma situação onde, em uma rotação de 3D, duas das três rotas de rotação se alinham, causando a perda de um grau de liberdade. Os quartênios evitam esse problema, permitindo uma representação mais estável das rotações.",
+                "Quais são as vantagens de usar quartênios em vez de matrizes de rotação?": "Os quartênios são mais eficientes computacionalmente, exigem menos operações (quatro multiplicações em vez de nove), e não sofrem com o gimbal lock. Eles também são mais estáveis e precisos em simulações de rotação contínua.",
+                "Os quartênios podem ser invertidos?": "Sim, os quartênios têm uma operação de inversão. Para um quartênio q = a + bi + cj + dk, o inverso é dado por q⁻¹ = (a - bi - cj - dk) / (a² + b² + c² + d²), onde o denominador é o módulo ao quadrado do quartênio.",
+                "Qual é o papel da parte real em um quartênio?": "A parte real a de um quartênio é responsável pela componente escalar, enquanto as partes imaginárias b, c, e d são responsáveis pela componente vetorial. A parte real determina a magnitude da rotação.",
+                "Existe alguma relação entre os quartênios e a álgebra de Lie?": "Sim, os quartênios podem ser vistos como uma álgebra de Lie, que é uma estrutura matemática usada para estudar simetrias e transformações. No caso dos quartênios, eles formam uma álgebra não comutativa, o que é uma característica típica de certas álgebra de Lie."
             }
         };
+
+        bestMatchTwoZeroResponse = 0;
+        let showingTopics = false;
+
+        function listTopics() {
+            let message = "<strong>Lista de tópicos disponíveis:</strong><br>";
+            let index = 1;
+            for (const category in rules) {
+                message += `${index}. ${category}<br>`;
+                index++;
+            }
+            message += `<div class="follow-up">Digite o número do tópico desejado para ver as perguntas e respostas correspondentes.</div>`;
+            showingTopics = true;
+            return message;
+        }
+
+        function showQuestionsByTopic(index) {
+            const categories = Object.keys(rules);
+            const topicIndex = parseInt(index, 10) - 1;
+
+            if (isNaN(topicIndex) || topicIndex < 0 || topicIndex >= categories.length) {
+                return "Número inválido. Por favor, escolha um dos números listados.";
+            }
+
+            const selectedCategory = categories[topicIndex];
+            const questions = rules[selectedCategory];
+            let message = `<strong>${selectedCategory}:</strong><br>`;
+            for (const question in questions) {
+                message += `<br><strong>Q:</strong> ${question}<br><strong>R:</strong> ${questions[question]}<br>`;
+            }
+            showingTopics = false;
+            bestMatchTwoZeroResponse = 0;
+            return message;
+        }
 
         /**
      * Calcula a distância de Levenshtein entre duas palavras.
@@ -277,16 +333,16 @@
              */
         function getRandomWelcomeMessage() {
             const welcomeMessages = [
-                "Olá! Como posso te ajudar hoje?",
-                "Oi, tudo bem? Como posso ser útil para você?",
-                "Olá, seja bem-vindo! O que posso fazer por você?",
-                "Oi! Como posso te ajudar neste dia?",
-                "Bem-vindo! Em que posso te ajudar hoje?",
-                "Oi, como posso te ajudar? Estou aqui para isso!",
-                "Olá! O que posso fazer por você agora?",
+                "Como posso te ajudar hoje?",
+                "Tudo bem? Como posso ser útil para você?",
+                "Seja bem-vindo! O que posso fazer por você?",
+                "Como posso te ajudar neste dia?",
+                "Em que posso te ajudar hoje?",
+                "Como posso te ajudar? Estou aqui para isso!",
+                "O que posso fazer por você?",
                 "Bem-vindo ao nosso chat! Como posso te auxiliar?",
-                "Oi! Como posso ajudar você com suas dúvidas?",
-                "Olá! Em que posso ser útil para você hoje?"
+                "Como posso ajudar você com suas dúvidas?",
+                "Em que posso ser útil para você hoje?"
             ];
 
             // Retorna uma mensagem aleatória da lista
@@ -305,47 +361,94 @@
             const welcomeMessage = `${greeting}! ${randomMessage}`;
 
             // Adiciona a mensagem de boas-vindas ao chat
-            chatbox.innerHTML += `<div class="bot-message"><strong>Bot:</strong> ${welcomeMessage}</div>`;
+            chatbox.innerHTML += `<div class="bot-message">🤖 <strong>Bot:</strong> ${welcomeMessage}</div>`;
             chatbox.scrollTop = chatbox.scrollHeight;  // Garante que a última mensagem fique visível
+
+            document.getElementById("userInput").focus();
         }
 
         // Exibe a mensagem de boas-vindas quando a página for carregada
         window.onload = displayWelcomeMessage;
 
+        function escapeHTML(str) {
+            return str.replace(/[&<>"'\/]/g, function (char) {
+                switch (char) {
+                    case '&': return '&amp;';
+                    case '<': return '&lt;';
+                    case '>': return '&gt;';
+                    case '"': return '&quot;';
+                    case "'": return '&#039;';
+                    case '/': return '&#x2F;';
+                    default: return char;
+                }
+            });
+        }        
+
+        function sanitizeInput(input) {
+            // Cria um elemento div temporário para remover qualquer tag HTML
+            const div = document.createElement('div');
+            div.textContent = input;  // Usa textContent para garantir que o conteúdo seja tratado como texto puro
+            return div.innerHTML;     // Retorna o texto sanitizado
+        }
+
         function sendMessage() {
             const inputField = document.getElementById("userInput");
             const chatbox = document.getElementById("chatbox");
-            let userText = inputField.value;
+            let userText = inputField.value.trim();
 
-            if (!userText.trim()) return;
+            if (!userText) return;
 
-            let bestMatch = findBestMatch(userText);
-            let botResponse = bestMatch.score > 0 ? bestMatch.answer : "Desculpe, não tenho uma resposta para essa pergunta. Por favor, pergunte-me sobre assuntos relacionados ou, se preferir, envie-nos uma mensagem através de nosso e-mail 'Fale Conosco'.";
+            // Sanitiza a entrada do usuário
+            userText = sanitizeInput(userText);
 
-            let followUpText = bestMatch.score > 0 ? `Caso esteja se referindo à pergunta: <em>"${bestMatch.question}"</em>.` : "";
-
-            // Adicionando a mensagem do usuário com animação
-            const userMessageDiv = document.createElement("div");
-            userMessageDiv.classList.add("user-message", "fade-in");  // Adiciona a classe de animação
-            userMessageDiv.innerHTML = `<strong>Você:</strong> ${userText}`;
+            // Exibe mensagem do usuário de forma segura (sem innerHTML)
+            var numeroAleatorioUserMessage = Math.floor(Math.random() * 10000);
+            const userMessageDiv = document.createElement('div');
+            userMessageDiv.id = numeroAleatorioUserMessage;
+            userMessageDiv.classList.add('user-message');
+            userMessageDiv.innerHTML = `🧑‍🏫 <strong>Você:</strong> ${userText}`;
             chatbox.appendChild(userMessageDiv);
 
-            // Adicionando a mensagem do bot com animação
-            const botMessageDiv = document.createElement("div");
-            botMessageDiv.classList.add("bot-message", "fade-in");  // Adiciona a classe de animação
-            botMessageDiv.innerHTML = `<strong>Bot:</strong> ${followUpText} ${botResponse}`;
+            let botResponse = "";
+            let followUpText = "";
+
+            if (showingTopics && /^\d+$/.test(userText)) {
+                // Usuário escolheu um número de tópico
+                botResponse = showQuestionsByTopic(userText);
+            } else {
+                const bestMatch = findBestMatch(userText);
+                if (bestMatch.score > 0) {
+                    botResponse = bestMatch.answer;
+                    followUpText = `Caso esteja se referindo à pergunta: <em>"${bestMatch.question}"</em>.`;
+                    bestMatchTwoZeroResponse = 0;
+                } else {
+                    bestMatchTwoZeroResponse++;
+                    botResponse = "Desculpe, não tenho uma resposta para essa pergunta. Por favor, pergunte-me sobre assuntos relacionados ou, se preferir, envie-nos uma mensagem através de nosso e-mail 💡 'Fale Conosco'.";
+                    if (bestMatchTwoZeroResponse >= 2) {
+                        botResponse += "<br><br>" + listTopics();
+                    }
+                }
+            }
+
+            var numeroAleatorioBotMessage = Math.floor(Math.random() * 10000);
+            const botMessageDiv = document.createElement('div');
+            botMessageDiv.id = numeroAleatorioBotMessage;
+            botMessageDiv.classList.add('bot-message');
+            botMessageDiv.innerHTML = `🤖 <strong>Bot:</strong> ${followUpText} ${botResponse} <br> `;
             chatbox.appendChild(botMessageDiv);
 
-            // Rola para a última mensagem
             chatbox.scrollTop = chatbox.scrollHeight;
             inputField.value = "";
 
             // Remove a animação após 0.5s (duração da animação)
             setTimeout(() => {
-                userMessageDiv.classList.remove("fade-in");
-                botMessageDiv.classList.remove("fade-in");
-            }, 500);
+                var lastUserMessageDiv = document.getElementById(`${numeroAleatorioUserMessage}`);
+                var lastBotMessageDiv = document.getElementById(`${numeroAleatorioBotMessage}`);
+                lastUserMessageDiv.classList.remove("fade-in");
+                lastBotMessageDiv.classList.remove("fade-in");
+            }, 1000);
         }
+
     </script>
 </body>
 
