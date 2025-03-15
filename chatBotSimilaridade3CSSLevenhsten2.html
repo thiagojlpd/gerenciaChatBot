@@ -8,209 +8,155 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* Definindo cores e fontes do Material Design */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap');
+        @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+    
         body {
             font-family: 'Roboto', sans-serif;
-            /* Fonte do Google Fonts - Roboto */
-            background-color: #f5f5f5;
-            /* Cor de fundo clara */
+            background: linear-gradient(to right, #e0f2f1, #f5f5f5);
             margin: 0;
-            /* Remove a margem padrão */
             padding: 0;
-            /* Remove o padding padrão */
             display: flex;
-            /* Utiliza Flexbox para o layout */
             justify-content: center;
-            /* Centraliza horizontalmente */
             align-items: center;
-            /* Centraliza verticalmente */
             height: 100vh;
-            /* Define a altura como 100% da viewport */
             color: #333;
-            /* Cor do texto */
             flex-direction: column;
-            /* Organiza os elementos na vertical */
-            /* Permite o layout flexível vertical */
         }
-
+    
         h2 {
             font-size: 24px;
-            /* Tamanho da fonte do título */
             color: #024940;
-            /* Cor do título */
             margin-bottom: 20px;
-            /* Espaçamento inferior */
         }
-
-        /* Container do chat */
+    
         #chatbox {
             width: 90cap;
-            /* Largura do container do chat */
-            height: 400px;
-            /* Altura do container do chat */
-            border-radius: 8px;
-            /* Bordas arredondadas */
-            border: 1px solid #ccc;
-            /* Borda do container */
+            height: 420px;
+            border-radius: 12px;
             background-color: #fff;
-            /* Cor de fundo do chat */
-            padding: 20px;
-            /* Padding interno do container */
+            padding: 24px;
             overflow-y: auto;
-            /* Barra de rolagem vertical se necessário */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            /* Sombra suave ao redor do chat */
-            animation: fadeIn 0.3s ease;
-            /* Animação de aparecimento suave */
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            animation: fadeIn 0.5s ease;
         }
-
-        /* Estilo do botão */
+    
         button {
             background-image: linear-gradient(to right, #80CBC4, #68a49e);
-            /* Gradiente linear do botão */
             color: white;
-            /* Cor do texto no botão */
             font-size: 16px;
-            /* Tamanho da fonte do botão */
             border: none;
-            /* Remove a borda padrão */
             padding: 10px 20px;
-            /* Padding do botão */
             cursor: pointer;
-            /* Cursor de pointer para indicar que é clicável */
-            border-radius: 4px;
-            /* Bordas arredondadas do botão */
-            transition: background-image 0.3s;
-            /* Transição suave do gradiente */
+            border-radius: 6px;
             margin-top: 10px;
-            /* Espaçamento superior do botão */
+            transition: all 0.3s ease-in-out;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
-
-        /* Efeito de mudança de cor do gradiente ao passar o mouse */
+    
         button:hover {
             background-image: linear-gradient(to right, #80CBC4, #71afa9);
-            /* Inverte as cores no hover */
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
-
-        /* Input de texto */
+    
+        button:active {
+            transform: scale(0.98);
+        }
+    
         #userInput {
             width: 100%;
-            /* Largura do input (100% do container) */
             padding: 10px;
-            /* Padding do input */
             font-size: 16px;
-            /* Tamanho da fonte */
             border: 1px solid #ccc;
-            /* Borda do input */
-            border-radius: 4px;
-            /* Bordas arredondadas */
+            border-radius: 6px;
             margin-top: 10px;
-            /* Espaçamento superior */
             box-sizing: border-box;
-            /* Inclui o padding na largura total do elemento */
-            transition: border-color 0.3s;
-            /* Transição suave para a borda */
+            transition: all 0.3s ease-in-out;
         }
-
-        /* Efeito de foco no input */
+    
         #userInput:focus {
             border-color: #00796b;
-            /* Cor da borda ao focar */
             outline: none;
-            /* Remove o outline padrão */
+            box-shadow: 0 0 0 3px rgba(0, 121, 107, 0.2);
         }
-
-        /* Adicionando animação fade-in */
+    
         .fade-in {
             animation: fadeIn 0.5s ease;
-            /* Animação de fade-in */
         }
-
-        /* Animação de fade-in */
+    
         @keyframes fadeIn {
             from {
                 opacity: 0;
-                /* Inicia invisível */
             }
-
             to {
                 opacity: 1;
-                /* Termina visível */
             }
         }
-
-        /* Estilo das mensagens */
+    
         .user-message,
-        .bot-message {            
-            margin-bottom: 15px;
-            /* Espaçamento inferior das mensagens */
-            padding: 10px;
-            /* Padding das mensagens */
-            border-radius: 8px;
-            /* Bordas arredondadas nas mensagens */
+        .bot-message {
+            margin-bottom: 8px;
+            padding: 12px 16px;
+            border-radius: 10px;
             max-width: 100%;
-            /* Largura máxima das mensagens */
             word-wrap: break-word;
-            /* Quebra de linha nas palavras */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            /* Sombra suave ao redor do chat */
+            backdrop-filter: blur(6px);
+            background: rgba(255, 255, 255, 0.7);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
-
+    
         .user-message {
             background-color: #80CBC4;
-            /* Cor de fundo das mensagens do usuário */            
             color: white;
-            /* Cor do texto das mensagens do usuário */
             align-self: flex-end;
-            /* Alinha a mensagem do usuário à direita */
+            border-left: 4px solid #4db6ac;
             animation: slideInRight 0.5s ease;
-            /* Animação de entrada da mensagem do usuário */
         }
-
+    
         .bot-message {
             background-color: #eeeeee;
-            /* Cor de fundo das mensagens do bot */
             color: #333;
-            /* Cor do texto das mensagens do bot */
+            align-self: flex-start;
+            border-left: 4px solid #ccc;
             animation: slideInLeft 0.5s ease;
-            /* Animação de entrada da mensagem do bot */
         }
-
-        /* Animação de entrada das mensagens */
+    
         @keyframes slideInRight {
-            from {
-                transform: translateX(100%);
-                /* Inicia fora da tela, à direita */
+            0% {
+                opacity: 0;
+                transform: translateX(30px);
             }
-
-            to {
+            100% {
+                opacity: 1;
                 transform: translateX(0);
-                /* Finaliza na posição original */
             }
         }
-
+    
         @keyframes slideInLeft {
-            from {
-                transform: translateX(-100%);
-                /* Inicia fora da tela, à esquerda */
+            0% {
+                opacity: 0;
+                transform: translateX(-30px);
             }
-
-            to {
+            100% {
+                opacity: 1;
                 transform: translateX(0);
-                /* Finaliza na posição original */
             }
         }
-
-        /* Estilo de texto para acompanhamento */
+    
         .follow-up {
             font-style: italic;
-            /* Texto em itálico */
             color: #00796b;
-            /* Cor do texto */
             margin-top: 10px;
-            /* Espaçamento superior */
         }
     </style>
+    
 
 </head>
 
