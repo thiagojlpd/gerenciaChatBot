@@ -631,6 +631,9 @@
 
             userText = sanitizeInput(userText);
 
+            let intencao = "";
+            intencao
+
             const numeroAleatorioUserMessage = Math.floor(Math.random() * 10000);
 
             const userMessageDiv = document.createElement('div');
@@ -654,7 +657,7 @@
                     followUpText = `🔍 <em>Caso esteja se referindo à pergunta:</em> "<strong>${bestMatch.question}</strong>"<br>`;
 
                     if (bestMatches.length > 1) {
-                        followUpTextComplement += `<br><em>Pode ser interessante ainda:</em><ul>`;
+                        followUpTextComplement += `<br><br><em>Pode ser interessante ainda:</em><ul>`;
                         bestMatches.slice(1).forEach(match => {
                             followUpTextComplement += `<li>"<strong>${match.question}</strong> ${match.answer}"</li>`;
                         });
@@ -677,7 +680,7 @@
             const botMessageDiv = document.createElement('div');
             botMessageDiv.id = numeroAleatorioBotMessage;
             botMessageDiv.classList.add('bot-message');
-            botMessageDiv.innerHTML = `<span class="emoji-bot">🤖</span> <strong>Bot:</strong><br>${followUpText} 💡 <em>Resposta:</em> ${botResponse}<br>${followUpTextComplement}`;
+            botMessageDiv.innerHTML = `<span class="emoji-bot">🤖</span> <strong>Bot:</strong><br>${followUpText} 💡 <em>Resposta:</em> ${botResponse} ${followUpTextComplement}`;
 
             chatbox.appendChild(botMessageDiv);
 
