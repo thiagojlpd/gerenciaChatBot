@@ -31,6 +31,7 @@
         }
 
         #chatbox {
+            position: relative;
             width: 90cap;
             height: 420px;
             border-radius: 12px;
@@ -43,6 +44,7 @@
             gap: 16px;
             animation: fadeIn 0.5s ease;
         }
+
 
         button {
             background-image: linear-gradient(to right, #80CBC4, #68a49e);
@@ -158,6 +160,70 @@
             color: #00796b;
             margin-top: 10px;
         }
+
+        @keyframes floatPulse {
+
+            0%,
+            100% {
+                transform: scale(1) translateY(0);
+            }
+
+            50% {
+                transform: scale(1.1) translateY(-2px);
+            }
+        }
+
+        .emoji-bot {
+            display: inline-block;
+            animation: floatPulse 1.5s ease-in-out infinite;
+        }
+
+        .info-button {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            text-align: center;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 0;
+        }
+
+        .info-button .info-tooltip {
+            visibility: hidden;
+            background-color: #333;
+            color: #fff;
+            text-align: left;
+            border-radius: 8px;
+            padding: 10px;
+            width: 260px;
+            position: absolute;
+            z-index: 999;
+            top: 30px;
+            right: 0;
+            opacity: 0;
+            transform: translateY(5px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            font-size: 13px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .info-button:hover .info-tooltip {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0);
+        }
     </style>
 
 
@@ -166,12 +232,26 @@
 <body>
 
     <!-- Container principal do chatbot -->
-    <div>
+    <div id="principal">
+
         <!-- Título da interface do chatbot -->
         <h2>Chatbot sobre necessidades de detonação</h2>
 
         <!-- Área onde as mensagens do chatbot e do usuário serão exibidas -->
-        <div id="chatbox"></div>
+        <div id="chatbox">
+            <!-- Botão "i" com tooltip, posicionado no canto superior direito -->
+            <button class="info-button" title="Informações sobre o funcionamento do chatbot">
+                i
+                <span class="info-tooltip">
+                    <strong>ℹ️ Técnicas utilizadas no Chatbot:</strong><br><br>
+                    • Busca com tokenização;<br>
+                    • Busca com exclusão de palavras menores que 03 caracteres (bad words);<br>
+                    • Busca fuzzy match com algoritmo de Levenshtein (busca aproximada);<br>
+                    • Exibe a melhor resposta + 03 similares;<br>
+                    • Após 02 perguntas sem resposta, mostra os tópicos disponíveis.
+                </span>
+            </button>
+        </div>
 
         <!-- Campo de entrada de texto para o usuário digitar perguntas -->
         <input type="text" id="userInput" placeholder="Digite sua pergunta...">
@@ -179,6 +259,9 @@
         <!-- Botão que aciona a função de envio da pergunta -->
         <button onclick="sendMessage()">Enviar</button>
     </div>
+
+
+
 
     <script>
         // Objeto contendo regras organizadas por categorias com perguntas e respostas
@@ -197,12 +280,14 @@
                 "Quando deve ser requerida a 'autorização para aquisição de explosivos'?": "A 'autorização para aquisição de explosivos' deve ser solicitada, e se faz necessária sempre que houver a aquisição dos explosivos classificados nos grupos de ordem 3.1, 3.3 e 3.4.",
                 "O que é necessário para requerer a 'autorização para aquisição de explosivos'?": "Para a aquisição de explosivos, é necessário registro com atividade que pressuponha a aquisição e com a atividade de armazenamento apostilada."
             },
-            "Teoria dos Quartênios": {
-                // Diversas perguntas e respostas sobre o tema "quartênios"
-                "O que é a teoria dos quartênios?": "A teoria dos quartênios é um conceito matemático que envolve a utilização de números chamados 'quartênios'...",
-                // (demais perguntas omitidas aqui para brevidade, mas seguem o mesmo padrão)
+            "Comércio Exterior": {
+                "O que acontece quando se dá uma importação de PCE sem a devida autorização prévia da DFPC?": "<br><br><i>Art. 43. O embarque de mercadoria sem autorização, exceto para os órgãos enquadrados na modalidade de licenciamento automático, trará, dentre outras, as seguintes consequências:<br/>I. Indeferimento da licença de importação com restrição de data de embarque;<br/>II. Indeferimento da licença de importação: e/ou<br/>III. Instauração de processo administrativo, a cargo da Região Militar com circunscrição sobre o local de desembarque do produto</i>. ",
+                "O que é a autorização prévia para importação?": "Para pessoas físicas, trata-se do Certificado Internacional de Importação (CII) e da Licença Simplificada de Importação (LSI) ou Licença de Importação (LI). <br/> Para pessoas jurídicas, trata-se da Licença de Importação (LI). Sobre o assunto, convém aduzir aos § 1.º e 2.º do Art. 7 da Portaria nº 1.729 Cmt EB, de 29 de outubro de 2019:<br><br><i>Art. 7º. Para a obtenção da autorização prévia para a importação, o interessado, pessoa física ou jurídica, deverá encaminhar requerimento (Anexo A ou B) ao Diretor de Fiscalização de Produtos controlados, autoridade militar a qual fica delegada a competência para a emissão do ato, sob a supervisão do Comando Logístico.<br/>§ 1º A autorização prévia será concedida pela DFPC, por meio da emissão do Certificado Internacional de Importação – CII (Anexo C);<br/>§ 2º A autorização prévia poderá também ser concedida diretamente na Licença de Importação (LI) gerada no SISCOMEX, neste caso, caracterizada pela mudança do status para: “Embarque autorizado” ou “Deferido”, conforme art. 37 do Decreto nº 10.030, de 30 de setembro de 2019</i>.",
+                "Quais os órgãos que se enquadram no licenciamento automático?": "<br><br>Aqueles que constam no art. 34 do Decreto nº 9.847, de 25 de junho 2019:<br><br><i>Art. 34º.  O Comando do Exército autorizará a aquisição e a importação de armas de fogo, munições e demais produtos controlados, mediante prévia comunicação, para os seguintes órgãos, instituições e corporações: I. a Polícia Federal;<br>II. a Polícia Rodoviária Federal;<br>III. Gabinete de Segurança Institucional da Presidência da República;<br>IV. Agência Brasileira de Inteligência;<br>V. o Departamento Penitenciário Nacional;<br>VI. Força Nacional de Segurança Pública, por meio da Secretaria Nacional de Segurança Pública;<br>VII. os órgãos policiais da Câmara dos Deputados e do Senado Federal a que se referem, respectivamente, o  inciso IV do caput do art. 51 e o  inciso XIII do  caput do art. 52 da Constituição;<br>VIII. as polícias civis dos Estados e do Distrito Federal;<br>IX. as polícias militares dos Estados e do Distrito Federal;<br>X. os corpos de bombeiros militares dos Estados e do Distrito Federal; e<br>XI. as guardas municipais</i>.",
+                "Como corrigir dados incorretos em uma operação já cadastrada no sistema?": "<br><br>Caso identifique erro após o cadastro da operação, utilize a funcionalidade 'Editar Operação' no SISCOFIS. Se a operação já tiver sido enviada para análise, será necessário abrir uma solicitação de retificação junto à área responsável com justificativa e documentos de suporte."
             }
         };
+
 
         // Variável para controlar se o chatbot está exibindo sugestões de tópicos (inicialmente não)
         bestMatchTwoZeroResponse = 0;
@@ -347,6 +432,43 @@
             return bestMatch;
         }
 
+        function findBestMatches(userText) {
+            const userKeywords = extractKeywords(userText);
+            const matches = [];
+
+            for (const category in rules) {
+                for (const question in rules[category]) {
+                    const questionKeywords = extractKeywords(question);
+                    let score = 0;
+
+                    userKeywords.forEach(userWord => {
+                        questionKeywords.forEach(questionWord => {
+                            const distance = levenshteinDistance(userWord, questionWord);
+                            if (distance === 0 || (distance <= 2 && questionWord.length > 3)) {
+                                score++;
+                            }
+                        });
+                    });
+
+                    // Só adiciona se o score for maior que zero
+                    if (score > 0) {
+                        matches.push({
+                            question: question,
+                            answer: rules[category][question],
+                            score: score
+                        });
+                    }
+                }
+            }
+
+            // Ordena do maior para o menor score
+            matches.sort((a, b) => b.score - a.score);
+
+            // Retorna os quatro melhores (ou menos, se houver menos que 4 com score > 0)
+            return matches.slice(0, 4);
+        }
+
+
         /**
          * Envia a mensagem quando o usuário pressiona "Enter".
          */
@@ -413,7 +535,7 @@
             const welcomeMessage = `${greeting}! ${randomMessage}`; // Combina saudação e mensagem
 
             // Adiciona a mensagem de boas-vindas ao chat
-            chatbox.innerHTML += `<div class="bot-message">🤖 <strong>Bot:</strong> ${welcomeMessage}</div>`;
+            chatbox.innerHTML += `<div class="bot-message"><span class="emoji-bot">🤖</span> <strong>Bot:</strong> ${welcomeMessage}</div>`;
             chatbox.scrollTop = chatbox.scrollHeight; // Rola o chat até a última mensagem
             document.getElementById("userInput").focus(); // Coloca o foco na caixa de entrada
         }
@@ -433,6 +555,7 @@
         /**
          * Função principal que envia a mensagem digitada pelo usuário.
          */
+        /* APRESENTA SOMENTE A PERGUNTA COM O MELHOR SCORE
         function sendMessage() {
             const inputField = document.getElementById("userInput"); // Obtém o campo de entrada do usuário
             const chatbox = document.getElementById("chatbox"); // Obtém a área do chat
@@ -496,7 +619,79 @@
                 lastUserMessageDiv.classList.remove("fade-in"); // Remove a animação da mensagem do usuário
                 lastBotMessageDiv.classList.remove("fade-in"); // Remove a animação da resposta do bot
             }, 1000);
+        } */
+
+        //APRESENTA A PERGUNTA COM O MELHOR SCORE E OUTRAS 3 COM SCORES PRÓXIMOS
+        function sendMessage() {
+            const inputField = document.getElementById("userInput");
+            const chatbox = document.getElementById("chatbox");
+            let userText = inputField.value.trim();
+
+            if (!userText) return;
+
+            userText = sanitizeInput(userText);
+
+            const numeroAleatorioUserMessage = Math.floor(Math.random() * 10000);
+
+            const userMessageDiv = document.createElement('div');
+            userMessageDiv.id = numeroAleatorioUserMessage;
+            userMessageDiv.classList.add('user-message');
+            userMessageDiv.innerHTML = `🧑‍🏫 <strong>Você:</strong> ${userText}`;
+            chatbox.appendChild(userMessageDiv);
+
+            let botResponse = "";
+            let followUpText = "";
+            let followUpTextComplement = "";
+
+            if (showingTopics && /^\d+$/.test(userText)) {
+                botResponse = showQuestionsByTopic(userText);
+            } else {
+                const bestMatches = findBestMatches(userText); // ← Agora usa os 4 melhores
+
+                if (bestMatches.length > 0) {
+                    const bestMatch = bestMatches[0];
+                    botResponse = "<strong>" + bestMatch.answer + "</strong>";
+                    followUpText = `🔍 <em>Caso esteja se referindo à pergunta:</em> "<strong>${bestMatch.question}</strong>"<br>`;
+
+                    if (bestMatches.length > 1) {
+                        followUpTextComplement += `<br><em>Pode ser interessante ainda:</em><ul>`;
+                        bestMatches.slice(1).forEach(match => {
+                            followUpTextComplement += `<li>"<strong>${match.question}</strong> ${match.answer}"</li>`;
+                        });
+                        followUpTextComplement += `</ul>`;
+                    }
+
+                    bestMatchTwoZeroResponse = 0;
+                } else {
+                    bestMatchTwoZeroResponse++;
+                    botResponse = "Desculpe, não tenho uma resposta para essa pergunta. Por favor, pergunte-me sobre assuntos relacionados ou, se preferir, envie-nos uma mensagem através de nosso e-mail 💡 'Fale Conosco'.";
+
+                    if (bestMatchTwoZeroResponse >= 2) {
+                        botResponse += "<br><br>" + listTopics();
+                    }
+                }
+            }
+
+            const numeroAleatorioBotMessage = Math.floor(Math.random() * 10000);
+
+            const botMessageDiv = document.createElement('div');
+            botMessageDiv.id = numeroAleatorioBotMessage;
+            botMessageDiv.classList.add('bot-message');
+            botMessageDiv.innerHTML = `<span class="emoji-bot">🤖</span> <strong>Bot:</strong><br>${followUpText} 💡 <em>Resposta:</em> ${botResponse}<br>${followUpTextComplement}`;
+
+            chatbox.appendChild(botMessageDiv);
+
+            chatbox.scrollTop = chatbox.scrollHeight;
+            inputField.value = "";
+
+            setTimeout(() => {
+                const lastUserMessageDiv = document.getElementById(`${numeroAleatorioUserMessage}`);
+                const lastBotMessageDiv = document.getElementById(`${numeroAleatorioBotMessage}`);
+                lastUserMessageDiv.classList.remove("fade-in");
+                lastBotMessageDiv.classList.remove("fade-in");
+            }, 1000);
         }
+
 
 
     </script>
