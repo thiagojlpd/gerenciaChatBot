@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abrir Chamada</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        input, textarea, button { display: block; margin-top: 10px; width: 100%; padding: 8px; }
+        .historico { margin-top: 20px; }
+        img { max-width: 100px; max-height: 100px; display: block; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h2>Abrir Chamada</h2>
+    <form id="formChamada">
+        <input type="text" id="postoGraduacao" placeholder="Posto/Graduação" required>
+        <input type="text" id="nomeGuerra" placeholder="Nome de Guerra" required>
+        <input type="text" id="organizacaoMilitar" placeholder="Organização Militar" required>
+        <input type="tel" id="telefone" placeholder="Telefone de Contato" required>
+        <input type="email" id="email" placeholder="E-mail Corporativo" required>
+        <input type="text" id="codigoIdentificacao" placeholder="Código Identificador do Processo" required>
+        <select id="tipoSolicitacao" required>
+            <option value="">Selecione o tipo de solicitação</option>
+            <option value="suporte">Suporte</option>
+            <option value="erro">Erro no Sistema</option>
+            <option value="melhoria">Melhoria</option>
+        </select>
+        <textarea id="acaoSistema" placeholder="Ação que fazia no sistema quando houve o erro" required></textarea>
+        <input type="url" id="linkSistema" placeholder="Link do sistema no momento do problema" required>
+        <textarea id="errosConsole" placeholder="Erros do console (F12)" required></textarea>
+        <textarea id="erroObtido" placeholder="Erro obtido durante a ação" required></textarea>
+        <input type="file" id="imagemPrint" accept="image/*">
+        <button type="submit">Abrir Chamada</button>
+    </form>
+    <h3>Chamadas Anteriores</h3>
+    <div class="historico" id="historico"></div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const form = document.getElementById("formChamada");
+            const historicoDiv = document.getElementById("historico");
+
+            function carregarDados() {
+                const dados = JSON.parse(localStorage.getItem("chamadas")) || [];
+                historicoDiv.innerHTML = dados.map((chamada, index) => `
+                    <div>
+                        <strong>Tipo:</strong> ${chamada.tipoSolicitacao} <br>
+                        <strong>Posto/Graduação:</strong> ${chamada.postoGraduacao} <br>
+                        <strong>Nome de Guerra:</strong> ${chamada.nomeGuerra} <br>
+                        <strong>Organização Militar:</strong> ${chamada.organizacaoMilitar} <br>
+                        <strong>Telefone:</strong> ${chamada.telefone} <br>
+                        <strong>E-mail:</strong> ${chamada.email} <br>
+                        <strong>Código Identificação:</strong> ${chamada.codigoIdentificacao} <br>
+                        <strong>Ação no Sistema:</strong> ${chamada.acaoSistema} <br>
+                        <strong>Link do Sistema:</strong> <a href="${chamada.linkSistema}" target="_blank">${chamada.linkSistema}</a> <br>
+                        <strong>Erros do Console:</strong> ${chamada.errosConsole} <br>
+                        <strong>Erro Obtido:</strong> ${chamada.erroObtido} <br>
+                        <button onclick="removerChamada(${index})">Remover</button>
+                    </div>
+                    <hr>
+                `).join("");
+            }
+            
+            carregarDados();
+            
+            form.addEventListener("submit", (event) => {
+                event.preventDefault();
+                salvarChamada();
+            });
+            
+            function salvarChamada() {
+                const chamada = {
+                    postoGraduacao: document.getElementById("postoGraduacao").value,
+                    nomeGuerra: document.getElementById("nomeGuerra").value,
+                    organizacaoMilitar: document.getElementById("organizacaoMilitar").value,
+                    telefone: document.getElementById("telefone").value,
+                    email: document.getElementById("email").value,
+                    codigoIdentificacao: document.getElementById("codigoIdentificacao").value,
+                    tipoSolicitacao: document.getElementById("tipoSolicitacao").value,
+                    acaoSistema: document.getElementById("acaoSistema").value,
+                    linkSistema: document.getElementById("linkSistema").value,
+                    errosConsole: document.getElementById("errosConsole").value,
+                    erroObtido: document.getElementById("erroObtido").value
+                };
+                
+                const novasChamadas = JSON.parse(localStorage.getItem("chamadas")) || [];
+                novasChamadas.push(chamada);
+                localStorage.setItem("chamadas", JSON.stringify(novasChamadas));
+                
+                form.reset();
+                carregarDados();
+            }
+
+            window.removerChamada = function(index) {
+                let chamadas = JSON.parse(localStorage.getItem("chamadas")) || [];
+                chamadas.splice(index, 1);
+                localStorage.setItem("chamadas", JSON.stringify(chamadas));
+                carregarDados();
+            }
+        });
+    </script>
+</body>
+</html>
