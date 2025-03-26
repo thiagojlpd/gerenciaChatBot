@@ -131,6 +131,27 @@
             animation: slideInLeft 0.5s ease;
         }
 
+        /* Efeito ao passar o mouse nas mensagens do usuário */
+        .user-message:hover {
+            background-image: linear-gradient(135deg, #4db6ac, #80CBC4);
+            /* Gradiente de cor */
+            transform: scale(1.02);
+            /* Aumenta o tamanho da div */
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+            /* Aumenta a sombra */
+        }
+
+        /* Efeito ao passar o mouse nas mensagens do bot */
+        .bot-message:hover {
+            background-image: linear-gradient(135deg, #e9e8e8, #cccccc);
+            /* Gradiente de cor */
+            transform: scale(1.02);
+            /* Aumenta o tamanho da div */
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+            /* Aumenta a sombra */
+        }
+
+
         @keyframes slideInRight {
             0% {
                 opacity: 0;
