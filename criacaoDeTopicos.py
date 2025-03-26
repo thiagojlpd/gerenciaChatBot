@@ -132,4 +132,10 @@ print(similaridade)
 """ ✅ Agrupa chamados semelhantes automaticamente.
 ✅ Gera rótulos de erros automaticamente com LDA.
 ✅ Mede a similaridade entre chamados para detectar duplicados.
-✅ Funciona para qualquer lista de chamados, basta mudar os exemplos. """
+✅ Funciona para qualquer lista de chamados, basta mudar os exemplos. 
+
+pip install nltk spacy scikit-learn pandas
+
+python -m spacy download pt_core_news_sm
+
+"""
