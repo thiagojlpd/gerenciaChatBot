@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leitura de Planilha e Gráfico</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        canvas { max-width: 600px; margin: 20px auto; }
+        select { margin: 10px; padding: 5px; }
+    </style>
+</head>
+<body>
+
+    <h2>Carregar Planilha e Gerar Gráfico</h2>
+    <input type="file" id="fileInput" accept=".xlsx"><br><br>
+
+    <label for="xSelect">Escolha o eixo X:</label>
+    <select id="xSelect"></select>
+
+    <label for="ySelect">Escolha o eixo Y:</label>
+    <select id="ySelect"></select>
+
+    <button onclick="atualizarGrafico()">Gerar Gráfico</button>
+
+    <canvas id="chartCanvas"></canvas>
+
+    <script>
+        let jsonData = [];
+
+        document.getElementById('fileInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+
+                const sheetName = workbook.SheetNames[0];
+                const sheet = workbook.Sheets[sheetName];
+                jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+                if (jsonData.length > 1) {
+                    popularSelects(jsonData[0]); // Atualiza os selects com os nomes das colunas
+                } else {
+                    alert("A planilha precisa conter pelo menos duas linhas de dados.");
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        });
+
+        function popularSelects(headers) {
+            const xSelect = document.getElementById('xSelect');
+            const ySelect = document.getElementById('ySelect');
+
+            xSelect.innerHTML = "";
+            ySelect.innerHTML = "";
+
+            headers.forEach((col, index) => {
+                let optionX = new Option(col, index);
+                let optionY = new Option(col, index);
+
+                xSelect.add(optionX);
+                ySelect.add(optionY);
+            });
+
+            ySelect.selectedIndex = 1; // Define a segunda coluna como padrão para Y
+        }
+
+        function atualizarGrafico() {
+            const xIndex = document.getElementById('xSelect').value;
+            const yIndex = document.getElementById('ySelect').value;
+
+            if (xIndex === yIndex) {
+                alert("O eixo X e o eixo Y devem ser diferentes!");
+                return;
+            }
+
+            const labels = jsonData.slice(1).map(row => row[xIndex]);  
+            const valores = jsonData.slice(1).map(row => row[yIndex]);
+
+            desenharGrafico(labels, valores, jsonData[0][yIndex]);
+        }
+
+        function desenharGrafico(labels, valores, titulo) {
+            const ctx = document.getElementById('chartCanvas').getContext('2d');
+
+            if (window.myChart) window.myChart.destroy(); 
+
+            window.myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: titulo,
+                        data: valores,
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>

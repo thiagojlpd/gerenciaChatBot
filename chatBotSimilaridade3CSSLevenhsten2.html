@@ -135,7 +135,7 @@
         .user-message:hover {
             background-image: linear-gradient(135deg, #4db6ac, #80CBC4);
             /* Gradiente de cor */
-            transform: scale(1.02);
+            /*transform: scale(1.01);*/
             /* Aumenta o tamanho da div */
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
             /* Aumenta a sombra */
@@ -143,9 +143,9 @@
 
         /* Efeito ao passar o mouse nas mensagens do bot */
         .bot-message:hover {
-            background-image: linear-gradient(135deg, #e9e8e8, #cccccc);
+            background-image: linear-gradient(135deg, #e9e8e8, #e8e8e8);
             /* Gradiente de cor */
-            transform: scale(1.02);
+            /*transform: scale(1.01);*/
             /* Aumenta o tamanho da div */
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
             /* Aumenta a sombra */
@@ -418,6 +418,7 @@
         // Variável para controlar se o chatbot está exibindo sugestões de tópicos (inicialmente não)
         bestMatchTwoZeroResponse = 0;
         let showingTopics = false;
+        let showingQuestions = false;
 
         // Função para listar os tópicos disponíveis (categorias)
         function listTopics() {
@@ -439,6 +440,33 @@
             // Retorna a mensagem formatada com os tópicos
             return message;
         }
+
+        function listQuestions(topicIndex) {
+            const topics = Object.keys(rules); // Pega os nomes dos tópicos
+            const selectedTopic = topics[topicIndex - 1]; // Ajusta índice (usuário escolhe a partir de 1)
+
+            if (!selectedTopic) {
+                return "<strong>Erro:</strong> Tópico inválido. Escolha um número da lista.";
+            }
+
+            let message = `<strong>Perguntas sobre: ${selectedTopic}</strong><br>`;
+            let index = 1;
+
+            // Lista todas as perguntas do tópico selecionado
+            for (const question in rules[selectedTopic]) {
+                message += `${index}. ${question}<br>`;
+                index++;
+            }
+
+            // Instrução para o usuário selecionar uma pergunta específica
+            message += `<div class="follow-up">Digite o número da pergunta desejada para ver a resposta.</div>`;
+
+            // Define variável para armazenar o tópico atualmente exibido
+            currentTopic = selectedTopic;
+
+            return message;
+        }
+
 
         // Função para exibir as perguntas e respostas de um tópico específico, com base no número escolhido pelo usuário
         function showQuestionsByTopic(index) {
@@ -591,7 +619,7 @@
             matches.sort((a, b) => b.score - a.score);
 
             // Retorna os quatro melhores (ou menos, se houver menos que 4 com score > 0)
-            return matches.slice(0, 4);
+            return matches.slice(0, 3);
         }
 
 
@@ -697,7 +725,7 @@
             const userMessageDiv = document.createElement('div');
             userMessageDiv.id = numeroAleatorioUserMessage;
             userMessageDiv.classList.add('user-message');
-            userMessageDiv.innerHTML = `🧑‍🏫 <strong>Você:</strong> ${userText}`;
+            userMessageDiv.innerHTML = `🙋 <strong>Você:</strong> ${userText}`;
             chatbox.appendChild(userMessageDiv);
 
             let botResponse = "";
@@ -706,6 +734,9 @@
 
             if (showingTopics && /^\d+$/.test(userText)) {
                 botResponse = showQuestionsByTopic(userText);
+            }
+            if (showingQuestions && /^\d+$/.test(userText)) {
+                    botResponse = showQuestionsByTopic(userText);
             } else {
                 const bestMatches = findBestMatches(userText); // ← Agora usa os 4 melhores
 
@@ -730,7 +761,7 @@
                     bestMatchTwoZeroResponse++;
                     botResponse = "Desculpe, não tenho uma resposta para essa pergunta. Por favor, pergunte-me sobre assuntos relacionados ou, se preferir, envie-nos uma mensagem através de nosso 'Fale Conosco'.";
 
-                    if (bestMatchTwoZeroResponse >= 2) {
+                    if (bestMatchTwoZeroResponse >= 1) {
                         botResponse += "<br><br>" + listTopics();
                     }
                 }
@@ -745,9 +776,7 @@
 
             chatbox.appendChild(botMessageDiv);
 
-            //chatbox.scroll({ top: chatbox.scrollHeight, behavior: 'smooth' });
             botMessageDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            //chatbox.scrollTop = chatbox.scrollHeight;
             inputField.value = "";
 
             setTimeout(() => {
