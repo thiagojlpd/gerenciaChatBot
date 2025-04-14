@@ -32,7 +32,9 @@
 
         #chatbox {
             position: relative;
-            width: 90cap;
+            width: 100%;
+            max-width: 600px;
+            /* Limita o tamanho máximo */
             height: 420px;
             border-radius: 12px;
             background-color: #fff;
@@ -44,7 +46,6 @@
             gap: 16px;
             animation: fadeIn 0.5s ease;
         }
-
 
         button {
             background-image: linear-gradient(to right, #80CBC4, #68a49e);
@@ -74,6 +75,7 @@
 
         #userInput {
             width: 100%;
+            /* Garante que o input ocupe toda a largura do chatbox */
             padding: 10px;
             font-size: 16px;
             border: 1px solid #ccc;
@@ -113,7 +115,36 @@
             backdrop-filter: blur(6px);
             background: rgba(255, 255, 255, 0.7);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            width: auto;
+            min-width: 50%;
+            /* Garante que as mensagens não fiquem muito pequenas */
+            max-width: 80%;
+            /* Limita o máximo para não ultrapassar o tamanho da tela */
+            box-sizing: border-box;
+            /* Garante que o padding não afete o tamanho total */
         }
+
+        /* Responsividade para a largura das mensagens */
+        @media (max-width: 768px) {
+
+            .user-message,
+            .bot-message {
+                width: 90%;
+                /* Torna as mensagens mais largas em telas menores */
+                padding: 10px 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+
+            .user-message,
+            .bot-message {
+                width: 95%;
+                /* Ajuste para telas ainda menores */
+                padding: 8px 12px;
+            }
+        }
+
 
         .user-message {
             background-color: #80CBC4;
@@ -131,26 +162,15 @@
             animation: slideInLeft 0.5s ease;
         }
 
-        /* Efeito ao passar o mouse nas mensagens do usuário */
         .user-message:hover {
             background-image: linear-gradient(135deg, #4db6ac, #80CBC4);
-            /* Gradiente de cor */
-            /*transform: scale(1.01);*/
-            /* Aumenta o tamanho da div */
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-            /* Aumenta a sombra */
         }
 
-        /* Efeito ao passar o mouse nas mensagens do bot */
         .bot-message:hover {
             background-image: linear-gradient(135deg, #e9e8e8, #e8e8e8);
-            /* Gradiente de cor */
-            /*transform: scale(1.01);*/
-            /* Aumenta o tamanho da div */
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-            /* Aumenta a sombra */
         }
-
 
         @keyframes slideInRight {
             0% {
@@ -217,8 +237,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-
-            padding: 0;
+            z-index: 10;
         }
 
         .info-button .info-tooltip {
@@ -238,6 +257,7 @@
             transition: opacity 0.3s ease, transform 0.3s ease;
             font-size: 13px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            z-index: 9999;
         }
 
         .info-button:hover .info-tooltip {
@@ -245,7 +265,62 @@
             opacity: 1;
             transform: translateY(0);
         }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            h2 {
+                font-size: 20px;
+            }
+
+            #chatbox {
+                width: 95%;
+                height: 350px;
+                padding: 16px;
+            }
+
+            button {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+
+            #userInput {
+                font-size: 14px;
+            }
+
+            .user-message,
+            .bot-message {
+                padding: 10px 14px;
+            }
+
+            .info-button {
+                width: 20px;
+                height: 20px;
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #chatbox {
+                width: 100%;
+                height: 300px;
+            }
+
+            button {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+
+            #userInput {
+                font-size: 14px;
+            }
+
+            .user-message,
+            .bot-message {
+                padding: 8px 12px;
+            }
+        }
     </style>
+
 
 
 </head>
@@ -266,10 +341,10 @@
                 <span class="info-tooltip">
                     <strong>ℹ️ Técnicas utilizadas no Chatbot:</strong><br><br>
                     • Busca com tokenização;<br>
-                    • Busca com exclusão de palavras menores que 03 caracteres (bad words);<br>
-                    • Busca fuzzy match com algoritmo de Levenshtein (busca aproximada);<br>
-                    • Exibe a melhor resposta + 03 similares;<br>
-                    • Após 02 perguntas sem resposta, mostra os tópicos disponíveis.
+                    • Busca com exclusão de palavras menores que 02 caracteres (bad words);<br>
+                    • Busca fuzzy match com algoritmo de Levenshtein (busca por similaridade);<br>
+                    • Exibe a melhor resposta + 02 similares;<br>
+                    • Aceita perguntas abertas ou a escolha de tópicos.
                 </span>
             </button>
         </div>
@@ -278,7 +353,11 @@
         <input type="text" id="userInput" placeholder="Digite sua pergunta...">
 
         <!-- Botão que aciona a função de envio da pergunta -->
-        <button onclick="sendMessage()">Enviar</button>
+        <span style="display: inline-flex; gap: 8px;">
+            <button onclick="sendMessage()">Enviar</button>
+            <button id="showFeedbacksBtn" onclick="showUserFeedbacks()">Feedbacks</button>
+        </span>
+
     </div>
 
 
@@ -682,17 +761,25 @@
          * Função que exibe a saudação de boas-vindas assim que a página é carregada.
          * Inclui uma saudação com base no horário do dia.
          */
-        function displayWelcomeMessage() {
-            const chatbox = document.getElementById("chatbox"); // Obtém a área do chat
-            const greeting = getGreeting(); // Obtém a saudação de acordo com o horário
-            const randomMessage = getRandomWelcomeMessage(); // Obtém uma mensagem aleatória
-            const welcomeMessage = `${greeting}! ${randomMessage} <br><br>Aqui estão os tópicos que podem ajudar:</strong><br><br> ${listTopics()}`; // Combina saudação e mensagem
+        function displayWelcomeMessage(customMessage = "") {
+            const chatbox = document.getElementById("chatbox");
+            const greeting = getGreeting();
 
-            // Adiciona a mensagem de boas-vindas ao chat
+            // Garantindo que customMessage seja uma string válida antes de aplicar o trim
+            const messageToUse = (customMessage && typeof customMessage === "string" && customMessage.trim() !== "")
+                ? customMessage
+                : getRandomWelcomeMessage();
+
+            const welcomeMessage = `${greeting}! ${messageToUse} <br><br><strong>Aqui estão os tópicos que podem ajudar:</strong><br><br>${listTopics()}`;
+
             chatbox.innerHTML += `<div class="bot-message"><span class="emoji-bot">🤖</span> <strong>Bot:</strong> ${welcomeMessage}</div>`;
-            chatbox.scrollTop = chatbox.scrollHeight; // Rola o chat até a última mensagem
-            document.getElementById("userInput").focus(); // Coloca o foco na caixa de entrada
+            chatbox.scrollTop = chatbox.scrollHeight;
+            document.getElementById("userInput").focus();
         }
+
+
+
+
 
         // Exibe a mensagem de boas-vindas quando a página for carregada
         window.onload = displayWelcomeMessage;
@@ -707,7 +794,8 @@
         }
 
 
-        //APRESENTA A PERGUNTA COM O MELHOR SCORE E OUTRAS 3 COM SCORES PRÓXIMOS
+        let userFeedbacks = {}; // Armazenar perguntas e feedbacks
+
         function sendMessage() {
             const inputField = document.getElementById("userInput");
             const chatbox = document.getElementById("chatbox");
@@ -717,10 +805,7 @@
 
             userText = sanitizeInput(userText);
 
-            let intencao = "";
-            intencao
-
-            const numeroAleatorioUserMessage = Math.floor(Math.random() * 10000);
+            let numeroAleatorioUserMessage = Math.floor(Math.random() * 10000);
 
             const userMessageDiv = document.createElement('div');
             userMessageDiv.id = numeroAleatorioUserMessage;
@@ -731,50 +816,75 @@
             let botResponse = "";
             let followUpText = "";
             let followUpTextComplement = "";
+            let showFeedback = false;
 
-            if (showingTopics && /^\d+$/.test(userText)) {
-                botResponse = showQuestionsByTopic(userText);
-            }
-            if (showingQuestions && /^\d+$/.test(userText)) {
+            // Verifica se é um número e busca por tópicos ou perguntas
+            if (/^\d+$/.test(userText)) {
+                if (showingTopics || showingQuestions) {
                     botResponse = showQuestionsByTopic(userText);
-            } else {
-                const bestMatches = findBestMatches(userText); // ← Agora usa os 4 melhores
+                    showFeedback = true;
+                } else {
+                    const bestMatches = findBestMatches(userText);
+                    if (bestMatches.length > 0) {
+                        const bestMatch = bestMatches[0];
+                        if (bestMatch.answer !== "Liste todos os tópicos") {
+                            botResponse = "<strong>" + bestMatch.answer + "</strong>";
+                            followUpText = `🔍 <em>Caso esteja se referindo à pergunta:</em> "<strong>${bestMatch.question}</strong>"<br>`;
+                            showFeedback = true;
 
+                            if (bestMatches.length > 1) {
+                                followUpTextComplement += `<br><br><em>Pode ser interessante ainda:</em><ul>`;
+                                bestMatches.slice(1, 4).forEach(match => {
+                                    followUpTextComplement += `<li>"<strong>${match.question}</strong> ${match.answer}"</li>`;
+                                });
+                                followUpTextComplement += `</ul>`;
+                            }
+                        }
+                    } else {
+                        botResponse = "Desculpe, não tenho uma resposta para essa pergunta. Por favor, pergunte-me sobre assuntos relacionados ou, se preferir, envie-nos uma mensagem através de nosso 'Fale Conosco'.";
+                        botResponse += "<br><br>" + listTopics();
+                        showFeedback = true;
+                    }
+                }
+            } else {
+                // Para texto livre (não numérico)
+                const bestMatches = findBestMatches(userText);
                 if (bestMatches.length > 0) {
                     const bestMatch = bestMatches[0];
-
-                    if (bestMatch.answer != "Liste todos os tópicos") {
+                    if (bestMatch.answer !== "Liste todos os tópicos") {
                         botResponse = "<strong>" + bestMatch.answer + "</strong>";
                         followUpText = `🔍 <em>Caso esteja se referindo à pergunta:</em> "<strong>${bestMatch.question}</strong>"<br>`;
+                        showFeedback = true;
 
                         if (bestMatches.length > 1) {
                             followUpTextComplement += `<br><br><em>Pode ser interessante ainda:</em><ul>`;
-                            bestMatches.slice(1).forEach(match => {
+                            bestMatches.slice(1, 4).forEach(match => {
                                 followUpTextComplement += `<li>"<strong>${match.question}</strong> ${match.answer}"</li>`;
                             });
                             followUpTextComplement += `</ul>`;
                         }
-
-                        bestMatchTwoZeroResponse = 0;
                     }
                 } else {
-                    bestMatchTwoZeroResponse++;
                     botResponse = "Desculpe, não tenho uma resposta para essa pergunta. Por favor, pergunte-me sobre assuntos relacionados ou, se preferir, envie-nos uma mensagem através de nosso 'Fale Conosco'.";
-
-                    if (bestMatchTwoZeroResponse >= 1) {
-                        botResponse += "<br><br>" + listTopics();
-                    }
+                    botResponse += "<br><br>" + listTopics();
+                    showFeedback = true;
                 }
             }
 
             const numeroAleatorioBotMessage = Math.floor(Math.random() * 10000);
-
             const botMessageDiv = document.createElement('div');
             botMessageDiv.id = numeroAleatorioBotMessage;
             botMessageDiv.classList.add('bot-message');
             botMessageDiv.innerHTML = `<span class="emoji-bot">🤖</span> <strong>Bot:</strong><br>${followUpText} 💡 <em>Resposta:</em> ${botResponse} ${followUpTextComplement}`;
-
             chatbox.appendChild(botMessageDiv);
+
+            // Adicionando a pergunta de feedback SOMENTE SE FOR RESPOSTA REAL
+            if (showFeedback) {
+                const feedbackDiv = document.createElement('div');
+                feedbackDiv.classList.add('feedback-message');
+                feedbackDiv.innerHTML = `<strong>🤔</strong> A resposta fornecida ou as questões listadas ajudaram a resolver sua dúvida? <button onclick="submitFeedback(true, '${userText}')">Sim</button> <button onclick="submitFeedback(false, '${userText}')">Não</button>`;
+                chatbox.appendChild(feedbackDiv);
+            }
 
             botMessageDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
             inputField.value = "";
@@ -787,6 +897,50 @@
             }, 1000);
         }
 
+        function submitFeedback(isResolved, userQuestion) {
+            const feedbackMessage = isResolved ? "Que bom que consegui te ajudar!" : "Sinto muito, vou tentar melhorar as respostas! Por favor, registre um chamado em nosso Fale Conosco.";
+
+            // Armazenando o feedback para a pergunta
+            userFeedbacks[userQuestion] = isResolved ? 'Sim' : 'Não';
+
+            const feedbackDiv = document.createElement('div');
+            feedbackDiv.classList.add('feedback-response');
+            feedbackDiv.innerHTML = `<span class="emoji-bot">🤖</span> <strong>Bot:</strong> ${feedbackMessage}`;
+            document.getElementById("chatbox").appendChild(feedbackDiv);
+
+            // Exibe o feedback e continua com a interação
+            feedbackDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            displayWelcomeMessage("Caso haja mais dúvidas, é só me perguntar ou escolher os tópicos abaixo.");
+        }
+
+        // Função que exibe os feedbacks armazenados
+        function showUserFeedbacks() {
+            const feedbackContainer = document.createElement('div');
+            feedbackContainer.classList.add('feedback-container');
+
+            let feedbackContent = '<h3>Feedbacks do Usuário:</h3>';
+
+            if (Object.keys(userFeedbacks).length === 0) {
+                feedbackContent += "<p><em>Não há feedbacks registrados ainda.</em></p>";
+            } else {
+                Object.keys(userFeedbacks).forEach(question => {
+                    const feedback = userFeedbacks[question];
+                    feedbackContent += `
+                <p><strong>Pergunta:</strong> "${question}"</p>
+                <p><strong>Feedback:</strong> ${feedback}</p>
+                <hr>
+            `;
+                });
+            }
+
+            feedbackContainer.innerHTML = feedbackContent;
+
+            // Exibe os feedbacks na interface do chat
+            const chatbox = document.getElementById("chatbox");
+            chatbox.appendChild(feedbackContainer);
+
+            feedbackContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
 
 
     </script>
